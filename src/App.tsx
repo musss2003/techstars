@@ -1,10 +1,10 @@
 import "./App.css";
-import RealEstatePricePredictorPage from "./RealEstatePredictorPage";
+import { AppRoutes } from "./AppRoutes";
 
 function App() {
   return (
     <>
-      <RealEstatePricePredictorPage />
+      <AppRoutes />
     </>
   );
 }

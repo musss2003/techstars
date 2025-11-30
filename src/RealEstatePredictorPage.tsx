@@ -7,6 +7,7 @@ import {
   MapPin,
   Plus,
   DollarSign,
+  Building2,
 } from "lucide-react";
 import {
   Card,
@@ -55,12 +56,44 @@ export interface PredictedListing extends Listing {
 }
 
 interface NewPropertyForm {
-  city: string;
-  m2: number;
-  floor: number;
-  built: number;
+  // Location
+  municipality: string;
   lat: number;
   lng: number;
+  
+  // Basic Info
+  price: number;
+  condition: string;
+  propertyType: string;
+  
+  // Size & Structure
+  numberOfRooms: number;
+  squareFootage: number;
+  squareFootageOfLand: number;
+  numberOfBathrooms: number;
+  level: number;
+  
+  // Features
+  equipment: string;
+  typeOfHeating: string;
+  yearBuilt: number;
+  typeOfFloor: string;
+  parking: string;
+  orientation: string;
+  
+  // Additional Features (boolean)
+  hasGarage: boolean;
+  hasElevator: boolean;
+  hasWater: boolean;
+  hasElectricity: boolean;
+  hasGas: boolean;
+  hasInternet: boolean;
+  hasParkingCircle: boolean;
+  hasBalcony: boolean;
+  hasTerrace: boolean;
+  isRegistered: boolean;
+  hasAlarm: boolean;
+  hasVideoSurveillance: boolean;
 }
 
 function PropertyMap({
@@ -275,7 +308,6 @@ function PropertyMap({
       selectedProperty.lat &&
       selectedProperty.lng
     ) {
-      const L = (window as any).L;
       mapInstanceRef.current.setView(
         [selectedProperty.lat, selectedProperty.lng],
         14,
@@ -295,6 +327,19 @@ function PropertyMap({
   );
 }
 
+// Municipalities in Canton Sarajevo
+const SARAJEVO_MUNICIPALITIES = [
+  "Centar",
+  "Novo Sarajevo",
+  "Novi Grad",
+  "Stari Grad",
+  "Hadžići",
+  "Ilidža",
+  "Ilijaš",
+  "Trnovo",
+  "Vogošća"
+];
+
 export default function RealEstatePricePredictorPage(): JSX.Element {
   const [selectedProperty, setSelectedProperty] =
     useState<PredictedListing | null>(null);
@@ -307,12 +352,44 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
   } | null>(null);
 
   const [newProperty, setNewProperty] = useState<NewPropertyForm>({
-    city: "Sarajevo",
-    m2: 50,
-    floor: 2,
-    built: 2010,
+    // Location
+    municipality: "Centar",
     lat: 0,
     lng: 0,
+    
+    // Basic Info
+    price: 0,
+    condition: "new",
+    propertyType: "apartment",
+    
+    // Size & Structure
+    numberOfRooms: 2,
+    squareFootage: 50,
+    squareFootageOfLand: 0,
+    numberOfBathrooms: 1,
+    level: 2,
+    
+    // Features
+    equipment: "furnished",
+    typeOfHeating: "central",
+    yearBuilt: 2010,
+    typeOfFloor: "parquet",
+    parking: "garage",
+    orientation: "south",
+    
+    // Additional Features
+    hasGarage: false,
+    hasElevator: false,
+    hasWater: true,
+    hasElectricity: true,
+    hasGas: false,
+    hasInternet: true,
+    hasParkingCircle: false,
+    hasBalcony: false,
+    hasTerrace: false,
+    isRegistered: false,
+    hasAlarm: false,
+    hasVideoSurveillance: false,
   });
   const [estimatedPrice, setEstimatedPrice] = useState<{
     price: number;
@@ -791,7 +868,7 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
 
   function handleNewPropertyChange(
     field: keyof NewPropertyForm,
-    value: string | number
+    value: string | number | boolean
   ) {
     setNewProperty((prev) => ({ ...prev, [field]: value }));
     setEstimatedPrice(null);
@@ -914,71 +991,418 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                   </div>
                 )}
 
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="city" className="text-sm font-medium">
-                      City
-                    </Label>
-                    <select
-                      id="city"
-                      value={newProperty.city}
-                      onChange={(e) =>
-                        handleNewPropertyChange("city", e.target.value)
-                      }
-                      className="w-full mt-1 px-3 py-2 border rounded-md bg-white"
-                    >
-                      <option value="Sarajevo">Sarajevo</option>
-                      <option value="Doboj">Doboj</option>
-                      <option value="Banja Luka">Banja Luka</option>
-                      <option value="Mostar">Mostar</option>
-                    </select>
+                <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                  {/* Location Section */}
+                  <div className="space-y-3 pb-3 border-b">
+                    <h3 className="text-sm font-semibold text-purple-900 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Location
+                    </h3>
+                    <div>
+                      <Label htmlFor="municipality" className="text-sm font-medium">
+                        Municipality (Canton Sarajevo)
+                      </Label>
+                      <select
+                        id="municipality"
+                        value={newProperty.municipality}
+                        onChange={(e) =>
+                          handleNewPropertyChange("municipality", e.target.value)
+                        }
+                        className="w-full mt-1 px-3 py-2 border rounded-md bg-white text-sm"
+                      >
+                        {SARAJEVO_MUNICIPALITIES.map((mun) => (
+                          <option key={mun} value={mun}>{mun}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="m2" className="text-sm font-medium">
-                      Size (m²)
-                    </Label>
-                    <Input
-                      id="m2"
-                      type="number"
-                      value={newProperty.m2}
-                      onChange={(e) =>
-                        handleNewPropertyChange("m2", Number(e.target.value))
-                      }
-                      className="mt-1"
-                    />
+                  {/* Basic Info Section */}
+                  <div className="space-y-3 pb-3 border-b">
+                    <h3 className="text-sm font-semibold text-purple-900 flex items-center gap-2">
+                      <Building2 className="w-4 h-4" />
+                      Basic Information
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="propertyType" className="text-xs font-medium">
+                          Property Type
+                        </Label>
+                        <select
+                          id="propertyType"
+                          value={newProperty.propertyType}
+                          onChange={(e) =>
+                            handleNewPropertyChange("propertyType", e.target.value)
+                          }
+                          className="w-full mt-1 px-2 py-1.5 border rounded-md bg-white text-sm"
+                        >
+                          <option value="apartment">Apartment</option>
+                          <option value="house">House</option>
+                          <option value="studio">Studio</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="condition" className="text-xs font-medium">
+                          Condition
+                        </Label>
+                        <select
+                          id="condition"
+                          value={newProperty.condition}
+                          onChange={(e) =>
+                            handleNewPropertyChange("condition", e.target.value)
+                          }
+                          className="w-full mt-1 px-2 py-1.5 border rounded-md bg-white text-sm"
+                        >
+                          <option value="new">New</option>
+                          <option value="renovated">Renovated</option>
+                          <option value="good">Good</option>
+                          <option value="needs-renovation">Needs Renovation</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="price" className="text-xs font-medium">
+                        Asking Price (BAM)
+                      </Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={newProperty.price}
+                        onChange={(e) =>
+                          handleNewPropertyChange("price", Number(e.target.value))
+                        }
+                        className="mt-1 text-sm"
+                        placeholder="0"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="floor" className="text-sm font-medium">
-                      Floor
-                    </Label>
-                    <Input
-                      id="floor"
-                      type="number"
-                      value={newProperty.floor}
-                      onChange={(e) =>
-                        handleNewPropertyChange("floor", Number(e.target.value))
-                      }
-                      className="mt-1"
-                    />
+                  {/* Size & Structure Section */}
+                  <div className="space-y-3 pb-3 border-b">
+                    <h3 className="text-sm font-semibold text-purple-900">Size & Structure</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="squareFootage" className="text-xs font-medium">
+                          Square Footage (m²)
+                        </Label>
+                        <Input
+                          id="squareFootage"
+                          type="number"
+                          value={newProperty.squareFootage}
+                          onChange={(e) =>
+                            handleNewPropertyChange("squareFootage", Number(e.target.value))
+                          }
+                          className="mt-1 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="squareFootageOfLand" className="text-xs font-medium">
+                          Land (m²)
+                        </Label>
+                        <Input
+                          id="squareFootageOfLand"
+                          type="number"
+                          value={newProperty.squareFootageOfLand}
+                          onChange={(e) =>
+                            handleNewPropertyChange("squareFootageOfLand", Number(e.target.value))
+                          }
+                          className="mt-1 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="numberOfRooms" className="text-xs font-medium">
+                          Rooms
+                        </Label>
+                        <Input
+                          id="numberOfRooms"
+                          type="number"
+                          value={newProperty.numberOfRooms}
+                          onChange={(e) =>
+                            handleNewPropertyChange("numberOfRooms", Number(e.target.value))
+                          }
+                          className="mt-1 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="numberOfBathrooms" className="text-xs font-medium">
+                          Bathrooms
+                        </Label>
+                        <Input
+                          id="numberOfBathrooms"
+                          type="number"
+                          value={newProperty.numberOfBathrooms}
+                          onChange={(e) =>
+                            handleNewPropertyChange("numberOfBathrooms", Number(e.target.value))
+                          }
+                          className="mt-1 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="level" className="text-xs font-medium">
+                          Level/Floor
+                        </Label>
+                        <Input
+                          id="level"
+                          type="number"
+                          value={newProperty.level}
+                          onChange={(e) =>
+                            handleNewPropertyChange("level", Number(e.target.value))
+                          }
+                          className="mt-1 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="yearBuilt" className="text-xs font-medium">
+                          Year Built
+                        </Label>
+                        <Input
+                          id="yearBuilt"
+                          type="number"
+                          value={newProperty.yearBuilt}
+                          onChange={(e) =>
+                            handleNewPropertyChange("yearBuilt", Number(e.target.value))
+                          }
+                          className="mt-1 text-sm"
+                          min="1950"
+                          max="2024"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="built" className="text-sm font-medium">
-                      Year Built
-                    </Label>
-                    <Input
-                      id="built"
-                      type="number"
-                      value={newProperty.built}
-                      onChange={(e) =>
-                        handleNewPropertyChange("built", Number(e.target.value))
-                      }
-                      className="mt-1"
-                      min="1950"
-                      max="2024"
-                    />
+                  {/* Features Section */}
+                  <div className="space-y-3 pb-3 border-b">
+                    <h3 className="text-sm font-semibold text-purple-900">Features</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="equipment" className="text-xs font-medium">
+                          Equipment
+                        </Label>
+                        <select
+                          id="equipment"
+                          value={newProperty.equipment}
+                          onChange={(e) =>
+                            handleNewPropertyChange("equipment", e.target.value)
+                          }
+                          className="w-full mt-1 px-2 py-1.5 border rounded-md bg-white text-sm"
+                        >
+                          <option value="furnished">Furnished</option>
+                          <option value="semi-furnished">Semi-Furnished</option>
+                          <option value="unfurnished">Unfurnished</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="typeOfHeating" className="text-xs font-medium">
+                          Heating
+                        </Label>
+                        <select
+                          id="typeOfHeating"
+                          value={newProperty.typeOfHeating}
+                          onChange={(e) =>
+                            handleNewPropertyChange("typeOfHeating", e.target.value)
+                          }
+                          className="w-full mt-1 px-2 py-1.5 border rounded-md bg-white text-sm"
+                        >
+                          <option value="central">Central</option>
+                          <option value="gas">Gas</option>
+                          <option value="electric">Electric</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="typeOfFloor" className="text-xs font-medium">
+                          Floor Type
+                        </Label>
+                        <select
+                          id="typeOfFloor"
+                          value={newProperty.typeOfFloor}
+                          onChange={(e) =>
+                            handleNewPropertyChange("typeOfFloor", e.target.value)
+                          }
+                          className="w-full mt-1 px-2 py-1.5 border rounded-md bg-white text-sm"
+                        >
+                          <option value="parquet">Parquet</option>
+                          <option value="tiles">Tiles</option>
+                          <option value="laminate">Laminate</option>
+                          <option value="marble">Marble</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="parking" className="text-xs font-medium">
+                          Parking
+                        </Label>
+                        <select
+                          id="parking"
+                          value={newProperty.parking}
+                          onChange={(e) =>
+                            handleNewPropertyChange("parking", e.target.value)
+                          }
+                          className="w-full mt-1 px-2 py-1.5 border rounded-md bg-white text-sm"
+                        >
+                          <option value="garage">Garage</option>
+                          <option value="parking-space">Parking Space</option>
+                          <option value="street">Street</option>
+                          <option value="none">None</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="orientation" className="text-xs font-medium">
+                          Orientation
+                        </Label>
+                        <select
+                          id="orientation"
+                          value={newProperty.orientation}
+                          onChange={(e) =>
+                            handleNewPropertyChange("orientation", e.target.value)
+                          }
+                          className="w-full mt-1 px-2 py-1.5 border rounded-md bg-white text-sm"
+                        >
+                          <option value="north">North</option>
+                          <option value="south">South</option>
+                          <option value="east">East</option>
+                          <option value="west">West</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Features Section */}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-purple-900">Additional Features</h3>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasGarage}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasGarage", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Garage</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasElevator}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasElevator", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Elevator</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasWater}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasWater", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Water</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasElectricity}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasElectricity", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Electricity</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasGas}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasGas", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Gas</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasInternet}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasInternet", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Internet</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasParkingCircle}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasParkingCircle", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Parking Circle</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasBalcony}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasBalcony", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Balcony</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasTerrace}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasTerrace", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Terrace</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.isRegistered}
+                          onChange={(e) =>
+                            handleNewPropertyChange("isRegistered", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Registered</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasAlarm}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasAlarm", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Alarm</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newProperty.hasVideoSurveillance}
+                          onChange={(e) =>
+                            handleNewPropertyChange("hasVideoSurveillance", e.target.checked)
+                          }
+                          className="w-4 h-4 rounded border-slate-300 text-purple-600"
+                        />
+                        <span>Video Surveillance</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
 

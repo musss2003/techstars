@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import type { ChangeEvent } from "react";
 import type { JSX } from "react";
 import {
   Home,
@@ -20,18 +19,33 @@ import { Label } from "./components/ui/label";
 import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import { Badge } from "./components/ui/badge";
+import type { PropertyType, SarajevoMunicipality } from "./components/NewPropertyFormSection.constants";
 
 export interface Listing {
+  // Core Identification
   id: string;
   title: string;
-  city: string;
+
+  // Location Details
+  municipality: SarajevoMunicipality;
+  location: string; // Specific street or neighborhood name (e.g., "Marijin Dvor")
+
+  // Structure Details
   m2: number;
-  floor: number;
-  built: number;
+  numberOfRooms: number;
+  typeOfProperty: PropertyType;
+
+  // Building Details
+  level: number; // The floor number (0 = Ground floor)
+  built: number; // Year of construction
+
+  // Pricing Details
   price: number;
   pricePerM2: number;
-  lat?: number;
-  lng?: number;
+
+  // Geographical Location (Required for Map)
+  lat: number;
+  lng: number;
 }
 
 export interface PredictedListing extends Listing {
@@ -309,67 +323,226 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
 
   const mockListings: Listing[] = useMemo(
     () => [
+      // --- ILIDŽA ---
       {
         id: "p1",
-        title: "1-bedroom apartment - Ilidža",
-        city: "Sarajevo",
+        title: "Modern 1-bedroom apartment - Ilidža",
+        municipality: "Ilidza", // FIX: Renamed 'city' to 'municipality'
+        location: "Rakovica", // ADDED: Street/Area
         m2: 45,
-        floor: 2,
+        level: 2, // FIX: Renamed 'floor' to 'level'
         built: 2005,
         price: 85000,
         pricePerM2: 1888,
-        lat: 43.8311,
+        numberOfRooms: 2, // ADDED: Assuming 1 bedroom + living room
+        typeOfProperty: "Apartment", // ADDED
+        lat: 43.8311, // Ilidža center
         lng: 18.3147,
       },
       {
         id: "p2",
-        title: "2-bedroom - Centar",
-        city: "Sarajevo",
+        title: "Renovated studio near Vrela Bosne - Ilidža",
+        municipality: "Ilidza",
+        location: "Lužani",
+        m2: 30,
+        level: 1,
+        built: 2012,
+        price: 52000,
+        pricePerM2: 1733,
+        numberOfRooms: 1, // ADDED: Studio is 1 room
+        typeOfProperty: "Apartment",
+        lat: 43.8304, // Lužani, Ilidža
+        lng: 18.2995,
+      },
+
+      // --- CENTAR ---
+      {
+        id: "p3",
+        title: "2-bedroom apartment - Centar",
+        municipality: "Centar",
+        location: "Bulevar",
         m2: 65,
-        floor: 3,
+        level: 3,
         built: 1998,
         price: 125000,
         pricePerM2: 1923,
-        lat: 43.8563,
+        numberOfRooms: 3, // ADDED: Assuming 2 bedroom + living room
+        typeOfProperty: "Apartment",
+        lat: 43.8563, // City center – near BBI
         lng: 18.4131,
       },
       {
-        id: "p3",
-        title: "Studio - Ilidža (renovated)",
-        city: "Sarajevo",
-        m2: 28,
-        floor: 1,
-        built: 2010,
-        price: 42000,
-        pricePerM2: 1500,
-        lat: 43.8289,
-        lng: 18.3089,
+        id: "p4",
+        title: "Luxury 3-bedroom near Marijin Dvor - Centar",
+        municipality: "Centar",
+        location: "Marijin Dvor",
+        m2: 92,
+        level: 6,
+        built: 2015,
+        price: 260000,
+        pricePerM2: 2826,
+        numberOfRooms: 4, // ADDED: Assuming 3 bedroom + living room
+        typeOfProperty: "Apartment",
+        lat: 43.8549, // Marijin Dvor
+        lng: 18.4062,
+      },
+
+      // --- STARI GRAD ---
+      {
+        id: "p5",
+        title: "Old-town authentic apartment - Baščaršija",
+        municipality: "Stari Grad",
+        location: "Baščaršija",
+        m2: 58,
+        level: 2,
+        built: 1960,
+        price: 138000,
+        pricePerM2: 2379,
+        numberOfRooms: 2,
+        typeOfProperty: "Apartment",
+        lat: 43.8597, // Baščaršija
+        lng: 18.4311,
       },
       {
-        id: "p4",
-        title: "3-bedroom family apartment - Novi Grad",
-        city: "Doboj",
+        id: "p6",
+        title: "Small 1-bedroom near Vijećnica",
+        municipality: "Stari Grad",
+        location: "Bistrik",
+        m2: 42,
+        level: 1,
+        built: 1975,
+        price: 88000,
+        pricePerM2: 2095,
+        numberOfRooms: 2,
+        typeOfProperty: "Apartment",
+        lat: 43.8591, // Vijećnica
+        lng: 18.4326,
+      },
+
+      // --- NOVI GRAD ---
+      {
+        id: "p7",
+        title: "Family 3-bedroom - Mojmilo (Novi Grad)",
+        municipality: "Novi Grad",
+        location: "Mojmilo",
         m2: 95,
-        floor: 4,
+        level: 4,
         built: 1985,
-        price: 95000,
-        pricePerM2: 1000,
-        lat: 44.7321,
-        lng: 18.087,
+        price: 145000,
+        pricePerM2: 1526,
+        numberOfRooms: 4,
+        typeOfProperty: "Apartment",
+        lat: 43.8385, // Mojmilo
+        lng: 18.3531,
+      },
+      {
+        id: "p8",
+        title: "Affordable 2-bedroom - Alipašino Polje",
+        municipality: "Novi Grad",
+        location: "Alipašino Polje",
+        m2: 60,
+        level: 9,
+        built: 1980,
+        price: 78000,
+        pricePerM2: 1300,
+        numberOfRooms: 3,
+        typeOfProperty: "Apartment",
+        lat: 43.8586, // Alipašino Polje
+        lng: 18.3498,
+      },
+
+      // --- NOVO SARAJEVO ---
+      {
+        id: "p9",
+        title: "High-rise apartment - Grbavica",
+        municipality: "Novo Sarajevo",
+        location: "Grbavica",
+        m2: 55,
+        level: 10,
+        built: 1988,
+        price: 119000,
+        pricePerM2: 2163,
+        numberOfRooms: 2,
+        typeOfProperty: "Apartment",
+        lat: 43.8489, // Grbavica
+        lng: 18.3933,
+      },
+      {
+        id: "p10",
+        title: "Modern 2-bedroom - Čengić Vila",
+        municipality: "Novo Sarajevo",
+        location: "Čengić Vila",
+        m2: 67,
+        level: 7,
+        built: 2008,
+        price: 138000,
+        pricePerM2: 2059,
+        numberOfRooms: 3,
+        typeOfProperty: "Apartment",
+        lat: 43.8473, // Čengić Vila
+        lng: 18.3786,
+      },
+
+      // --- VOGOŠĆA ---
+      {
+        id: "p11",
+        title: "Affordable apartment - Vogošća",
+        municipality: "Vogosca", // Changed for consistency (e.g., 'Vogosca' without diacritics)
+        location: "Pretis",
+        m2: 72,
+        level: 4,
+        built: 2002,
+        price: 98000,
+        pricePerM2: 1361,
+        numberOfRooms: 3,
+        typeOfProperty: "Apartment",
+        lat: 43.9034, // Vogošća center
+        lng: 18.35,
+      },
+      {
+        id: "p12",
+        title: "1-bedroom starter home - Hotonj (Vogošća)",
+        municipality: "Vogosca",
+        location: "Hotonj",
+        m2: 48,
+        level: 1,
+        built: 2014,
+        price: 72000,
+        pricePerM2: 1500,
+        numberOfRooms: 2,
+        typeOfProperty: "Apartment",
+        lat: 43.8823, // Hotonj
+        lng: 18.3659,
       },
     ],
     []
   );
 
   const getValueRating = (
-    pricePerM2: number
+    pricePerM2: number,
+    municipality: SarajevoMunicipality = "Centar"
   ): { color: string; label: string } => {
-    if (pricePerM2 < 1400)
-      return { color: "#10b981", label: "Excellent Value" };
-    if (pricePerM2 < 1600) return { color: "#3b82f6", label: "Good Value" };
-    if (pricePerM2 < 1800) return { color: "#f59e0b", label: "Fair Value" };
-    if (pricePerM2 < 2000) return { color: "#ef4444", label: "Above Market" };
-    return { color: "#991b1b", label: "Overpriced" };
+    // Base benchmark prices for Sarajevo municipalities (Approx. 2024/2025)
+    const benchmarks: Record<string, number> = {
+      Centar: 3500,
+      "Stari Grad": 3200,
+      "Novo Sarajevo": 3000,
+      "Novi Grad": 2600,
+      Ilidža: 2400,
+      Vogošća: 2100,
+      Hadžići: 1800,
+      Trnovo: 2500, // Tourist potential
+      Ilijaš: 1600,
+    };
+
+    const benchmark = benchmarks[municipality] || 2500;
+    const ratio = pricePerM2 / benchmark;
+
+    if (ratio < 0.85) return { color: "#10b981", label: "Under Market Value" }; // < 85% of avg
+    if (ratio < 0.95) return { color: "#3b82f6", label: "Fair Market Price" }; // 85-95%
+    if (ratio < 1.05) return { color: "#f59e0b", label: "Market Average" }; // 95-105%
+    if (ratio < 1.15) return { color: "#ef4444", label: "Slightly High" }; // 105-115%
+    return { color: "#991b1b", label: "Overpriced" }; // > 115%
   };
 
   const generatePrediction = React.useCallback((listing: Listing) => {
@@ -382,22 +555,77 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
   }, []);
 
   function handlePredictPrice(listing: Listing): void {
-    const { predictedPrice, predictedPricePerM2, confidence } =
-      generatePrediction(listing);
+    // We use the same 'getValueRating' logic but inverted to generate a prediction
+    // closer to the "True Value" rather than the "Listing Price"
+
+    const marketStatus = getValueRating(
+      listing.pricePerM2,
+      listing.municipality
+    );
+
+    let adjustmentFactor = 1.0;
+
+    // If the listing is marked "Overpriced", the AI predicts the real value is lower
+    if (marketStatus.label === "Overpriced") adjustmentFactor = 0.85;
+    if (marketStatus.label === "Slightly High") adjustmentFactor = 0.92;
+    if (marketStatus.label === "Under Market Value") adjustmentFactor = 1.05; // Might bid higher
+
+    // Listings on extreme floors (Ground or No Elevator High) usually trade lower than asking
+    if (listing.level === 0 || listing.level > 5) adjustmentFactor -= 0.03;
+
+    const predictedPricePerM2 = Math.round(
+      listing.pricePerM2 * adjustmentFactor
+    );
+    const predictedPrice = predictedPricePerM2 * listing.m2;
+
+    // Calculate confidence based on data completeness
+    // If we have lat/lng and detailed fields, confidence is higher
+    const confidence = listing.lat && listing.lng ? 85 : 60;
 
     setSelectedProperty({
       ...listing,
       predictedPrice,
       predictedPricePerM2,
-      confidence,
+      confidence: Math.round(confidence + Math.random() * 10),
     });
   }
 
-  function handleEstimateTimeToSell(price: number, listing: Listing): void {
-    const cityMedian = 1700;
-    const factor = price / (listing.m2 * cityMedian);
-    const days = Math.round(7 + factor * 60 + Math.random() * 30);
-    setTimeToSellEstimate(days);
+  function handleEstimateTimeToSell(): void {
+    // If the user hasn't calculated an estimate yet, we can't predict time to sell accurately
+    if (!estimatedPrice) return;
+
+    const askingPrice = newProperty.price;
+    const aiValuation = estimatedPrice.price;
+
+    // 1. Price Delta Ratio
+    // If Asking 200k vs AI 100k -> Ratio 2.0 (Takes forever)
+    // If Asking 90k vs AI 100k -> Ratio 0.9 (Sells fast)
+    const ratio = askingPrice / aiValuation;
+
+    // 2. Base Days (Average market velocity)
+    let days = 45;
+
+    // 3. Adjust based on ratio
+    if (ratio < 0.9) days = 14; // Fire sale
+    else if (ratio < 1.0) days = 30; // Competitive
+    else if (ratio < 1.1) days = 60; // Standard negotiation buffer
+    else if (ratio < 1.2) days = 120; // Slightly overpriced
+    else days = 365; // Overpriced, might sit for a year
+
+    // 4. Adjust for Liquidity Factors (Attributes)
+    if (newProperty.m2 < 50) days *= 0.8; // Small units sell faster
+    if (
+      newProperty.municipality === "Centar" ||
+      newProperty.municipality === "Novo Sarajevo"
+    )
+      days *= 0.9; // High demand areas
+    if (newProperty.condition === "Needs Renovation") days *= 1.3; // Takes longer to find buyer willing to do work
+    if (newProperty.price > 500000) days *= 1.5; // Luxury market moves slower
+
+    // 5. Random Variation
+    days = Math.round(days + (Math.random() * 14 - 7));
+
+    setTimeToSellEstimate(Math.max(5, days)); // Minimum 5 days
   }
 
   function handleMapClick(lat: number, lng: number): void {
@@ -407,45 +635,156 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
   }
 
   function handleEstimateNewProperty(): void {
-    if (!newPropertyLocation) {
+    // 1. Validation
+    if (newProperty.lat === null || newProperty.lng === null) {
       alert("Please click on the map to select a location first.");
       return;
     }
 
-    // Simple ML-like estimation based on nearby properties and property features
-    const nearbyProperties = mockListings.filter(
-      (p) => p.city === newProperty.city && p.lat && p.lng
+    // 2. Base Price Calculation (Comps + Municipality Fallback)
+    const nearby = mockListings.filter(
+      (p) => p.municipality === newProperty.municipality
     );
 
-    let basePricePerM2 = 1700; // Default base price
+    // Default base prices if no comps exist
+    const municipalityBasePrices: Record<string, number> = {
+      Centar: 3200,
+      "Stari Grad": 3000,
+      "Novo Sarajevo": 2800,
+      "Novi Grad": 2400,
+      Ilidža: 2200,
+      Vogošća: 1900,
+      Hadžići: 1700,
+    };
 
-    if (nearbyProperties.length > 0) {
-      // Calculate average price in the area
-      const avgPricePerM2 =
-        nearbyProperties.reduce((sum, p) => sum + p.pricePerM2, 0) /
-        nearbyProperties.length;
-      basePricePerM2 = avgPricePerM2;
+    let basePricePerM2 =
+      municipalityBasePrices[newProperty.municipality] || 2000;
+
+    if (nearby.length > 0) {
+      const avg =
+        nearby.reduce((sum, p) => sum + p.pricePerM2, 0) / nearby.length;
+      // We weight the comps 70% and the general municipal average 30% to smooth outliers
+      basePricePerM2 = avg * 0.7 + basePricePerM2 * 0.3;
     }
 
-    // Adjust for property features
-    const age = 2024 - newProperty.built;
-    const ageFactor = age < 5 ? 1.15 : age < 15 ? 1.05 : age < 30 ? 0.95 : 0.85;
-    const floorFactor =
-      newProperty.floor >= 1 && newProperty.floor <= 4 ? 1.02 : 0.98;
-    const sizeFactor =
-      newProperty.m2 < 40 ? 1.1 : newProperty.m2 > 100 ? 0.95 : 1.0;
+    // 3. Attribute Multipliers
+    let multiplier = 1.0;
 
-    const estimatedPricePerM2 = Math.round(
-      basePricePerM2 * ageFactor * floorFactor * sizeFactor
-    );
+    // --- CONDITION ---
+    switch (newProperty.condition) {
+      case "Newly Built":
+        multiplier += 0.25;
+        break; // +25%
+      case "Renovated":
+        multiplier += 0.15;
+        break; // +15%
+      case "In Good Condition":
+        multiplier += 0.0;
+        break;
+      case "Needs Renovation":
+        multiplier -= 0.15;
+        break; // -15%
+    }
+
+    // --- HEATING (Crucial in Sarajevo due to smog/winter) ---
+    switch (newProperty.heatingType) {
+      case "Central Heating": // Top Tier
+      case "Gas":
+      case "Heat Pump":
+      case "Floor Heating":
+        multiplier += 0.05;
+        break;
+      case "Electric Heating": // Neutral
+        break;
+      case "Solid Fuel": // Negative impact in urban areas
+        multiplier -= 0.05;
+        break;
+    }
+
+    // --- FLOOR / LEVEL ---
+    const { level } = newProperty;
+    if (level === 0) multiplier -= 0.05; // Ground floor penalty
+    else if (level >= 1 && level <= 3) multiplier += 0.03; // Ideal floors
+    else if (level > 4 && level < 10) multiplier += 0.0; // Standard
+    else if (level >= 10) multiplier -= 0.02; // High rise (often older elevators)
+
+    // --- EQUIPMENT ---
+    if (newProperty.equipment === "Fully Furnished") multiplier += 0.08;
+    if (newProperty.equipment === "Semi-furnished") multiplier += 0.03;
+
+    // --- PARKING (Huge value add) ---
+    if (newProperty.parking) {
+      // Parking is worth more in dense areas
+      if (["Centar", "Stari Grad"].includes(newProperty.municipality)) {
+        multiplier += 0.1;
+      } else {
+        multiplier += 0.05;
+      }
+    }
+
+    // --- ORIENTATION ---
+    if (["South", "South-West", "West"].includes(newProperty.orientation)) {
+      multiplier += 0.03; // Sunnier, warmer
+    } else if (newProperty.orientation === "North") {
+      multiplier -= 0.02; // Colder, darker
+    }
+
+    // --- STRUCTURE ---
+    // Bathrooms: More than 1 is a luxury in standard apts
+    if (newProperty.bathrooms > 1) multiplier += 0.02;
+
+    // Floor Type
+    if (
+      newProperty.floorType === "Parquet" ||
+      newProperty.floorType === "Marble"
+    )
+      multiplier += 0.02;
+
+    // Type of Property adjustments
+    if (newProperty.typeOfProperty === "House") multiplier -= 0.1; // Houses generally cheaper per m2 than apts
+    if (newProperty.typeOfProperty === "Commercial Property") multiplier += 0.1;
+
+    // --- AGE FACTOR ---
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - newProperty.built;
+    // Austro-Hungarian builds (pre-1940) often hold value in Centar
+    if (age > 80 && newProperty.municipality === "Centar") {
+      multiplier += 0.05; // Vintage charm premium
+    } else {
+      // Standard depreciation
+      if (age < 5) multiplier += 0.05;
+      else if (age > 40 && newProperty.condition !== "Renovated")
+        multiplier -= 0.1;
+    }
+
+    // --- SIZE CURVE ---
+    // Smaller units cost more per m2
+    if (newProperty.m2 < 35) multiplier += 0.1;
+    else if (newProperty.m2 > 110) multiplier -= 0.05;
+
+    // 4. Final Calculation
+    const estimatedPricePerM2 = Math.round(basePricePerM2 * multiplier);
     const estimatedTotalPrice = estimatedPricePerM2 * newProperty.m2;
-    const confidence = Math.round(65 + Math.random() * 25);
-    const rating = getValueRating(estimatedPricePerM2);
+
+    // 5. Confidence Calculation
+    // We reduce confidence if the input data is contradictory or scarce
+    let confidence = 85;
+    if (nearby.length === 0) confidence -= 15;
+    if (newProperty.condition === "Needs Renovation") confidence -= 5; // Harder to est. renovation costs
+
+    // Add slight randomness to simulate market volatility
+    confidence = Math.round(confidence + (Math.random() * 10 - 5));
+
+    // 6. Set State
+    const rating = getValueRating(
+      estimatedPricePerM2,
+      newProperty.municipality
+    );
 
     setEstimatedPrice({
       price: estimatedTotalPrice,
       pricePerM2: estimatedPricePerM2,
-      confidence,
+      confidence: Math.min(99, Math.max(40, confidence)), // Clamp between 40-99
       rating: rating.label,
     });
   }
@@ -698,7 +1037,7 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                       </h4>
                       <p className="text-sm text-slate-600">
                         {selectedProperty.m2} m² • Floor{" "}
-                        {selectedProperty.floor} • Built{" "}
+                        {selectedProperty.floorType} • Built{" "}
                         {selectedProperty.built}
                       </p>
                     </div>
@@ -739,10 +1078,7 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                       <Button
                         onClick={() => {
                           if (selectedProperty)
-                            handleEstimateTimeToSell(
-                              selectedProperty.price,
-                              selectedProperty
-                            );
+                            handleEstimateTimeToSell();
                         }}
                         variant="outline"
                         className="w-full gap-2"

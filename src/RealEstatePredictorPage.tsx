@@ -335,6 +335,7 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
     lat: number;
     lng: number;
   } | null>(null);
+  const [isEstimating, setIsEstimating] = useState(false);
 
   const [newProperty, setNewProperty] = useState<NewPropertyForm>({
     // Location
@@ -482,11 +483,16 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
     setEstimatedPrice(null);
   }
 
-  function handleEstimateNewProperty(): void {
+  async function handleEstimateNewProperty(): Promise<void> {
     if (!newPropertyLocation) {
       alert("Please click on the map to select a location first.");
       return;
     }
+
+    setIsEstimating(true);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     // Enhanced ML-like estimation based on all property features
     const nearbyProperties = mockListings.filter(
@@ -558,6 +564,8 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
       confidence,
       rating: rating.label,
     });
+    
+    setIsEstimating(false);
   }
 
   function handleNewPropertyChange(
@@ -591,81 +599,80 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT SIDE - Map */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-600" />
-                  Interactive Property Map
-                </CardTitle>
-                <CardDescription>
-                  Click on the map to select a location for your property or
-                  explore existing listings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PropertyMap
-                  listings={mockListings}
-                  selectedProperty={selectedProperty}
-                  onSelectProperty={(listing) => {
-                    setSelectedProperty(listing);
-                    handlePredictPrice(listing);
-                    setNewPropertyLocation(null);
-                    setEstimatedPrice(null);
-                  }}
-                  newPropertyLocation={newPropertyLocation}
-                  onMapClick={handleMapClick}
-                />
+        {/* Full Width Map at Top */}
+        <div className="mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                Interactive Property Map
+              </CardTitle>
+              <CardDescription>
+                Click on the map to select a location for your property or
+                explore existing listings
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PropertyMap
+                listings={mockListings}
+                selectedProperty={selectedProperty}
+                onSelectProperty={(listing) => {
+                  setSelectedProperty(listing);
+                  handlePredictPrice(listing);
+                  setNewPropertyLocation(null);
+                  setEstimatedPrice(null);
+                }}
+                newPropertyLocation={newPropertyLocation}
+                onMapClick={handleMapClick}
+              />
 
-                <div className="mt-4 p-3 bg-slate-50 rounded-lg">
-                  <p className="text-xs font-medium text-slate-700 mb-2">
-                    Map Legend
-                  </p>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: "#10b981" }}
-                      ></div>
-                      <span>Excellent Value</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: "#3b82f6" }}
-                      ></div>
-                      <span>Good Value</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: "#f59e0b" }}
-                      ></div>
-                      <span>Fair Value</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: "#ef4444" }}
-                      ></div>
-                      <span>Above Market</span>
-                    </div>
+              <div className="mt-4 p-3 bg-slate-50 rounded-lg">
+                <p className="text-xs font-medium text-slate-700 mb-2">
+                  Map Legend
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#10b981" }}
+                    ></div>
+                    <span>Excellent Value</span>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-slate-200">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-purple-500 border-2 border-white"></div>
-                      <span>Your New Property</span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#3b82f6" }}
+                    ></div>
+                    <span>Good Value</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#f59e0b" }}
+                    ></div>
+                    <span>Fair Value</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#ef4444" }}
+                    ></div>
+                    <span>Above Market</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-purple-500 border-2 border-white"></div>
+                    <span>Your New Property</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* RIGHT SIDE - Forms */}
-          <div className="space-y-6">
+        {/* Symmetric Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT COLUMN - New Property Form */}
+          <div>
             {/* New Property Form */}
             <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
               <CardHeader>
@@ -1103,10 +1110,19 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                 <Button
                   onClick={handleEstimateNewProperty}
                   className="w-full gap-2 bg-purple-600 hover:bg-purple-700"
-                  disabled={!newPropertyLocation}
+                  disabled={!newPropertyLocation || isEstimating}
                 >
-                  <DollarSign className="w-4 h-4" />
-                  Estimate Fair Price
+                  {isEstimating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Estimating...
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign className="w-4 h-4" />
+                      Estimate Fair Price
+                    </>
+                  )}
                 </Button>
 
                 {estimatedPrice && (
@@ -1134,20 +1150,22 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                 )}
               </CardContent>
             </Card>
+          </div>
 
-            {/* Existing Property Analysis */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
-                  Property Analysis
-                </CardTitle>
-                <CardDescription>
-                  Click on a marker to analyze existing properties
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {selectedProperty ? (
+          {/* RIGHT COLUMN - Existing Property Analysis */}
+          <div>
+            {selectedProperty ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                    Property Analysis
+                  </CardTitle>
+                  <CardDescription>
+                    Analysis of selected property from the map
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold text-slate-900 mb-1">
@@ -1160,7 +1178,19 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                       </p>
                     </div>
 
-                    {selectedProperty.predictedPrice ? (
+                    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <p className="text-xs font-medium text-slate-700 mb-1">
+                        LISTED PRICE
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900">
+                        {selectedProperty.price.toLocaleString()} BAM
+                      </p>
+                      <p className="text-sm text-slate-600 mt-1">
+                        {selectedProperty.pricePerM2.toLocaleString()} BAM/m²
+                      </p>
+                    </div>
+
+                    {selectedProperty.predictedPrice && selectedProperty.predictedPricePerM2 ? (
                       <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
                         <p className="text-xs font-medium text-blue-900 mb-1">
                           AI PREDICTED PRICE
@@ -1170,7 +1200,7 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                         </p>
                         <div className="flex items-center justify-between mt-2 text-sm">
                           <span className="text-slate-600">
-                            ~{selectedProperty.predictedPricePerM2} BAM/m²
+                            {selectedProperty.predictedPricePerM2.toLocaleString()} BAM/m²
                           </span>
                           <Badge
                             variant="secondary"
@@ -1178,6 +1208,19 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                           >
                             {selectedProperty.confidence}% confidence
                           </Badge>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-blue-200">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-blue-900 font-medium">Price Difference:</span>
+                            <span className={`font-bold ${
+                              selectedProperty.predictedPrice > selectedProperty.price
+                                ? 'text-green-600'
+                                : 'text-red-600'
+                            }`}>
+                              {selectedProperty.predictedPrice > selectedProperty.price ? '+' : ''}
+                              {(selectedProperty.predictedPrice - selectedProperty.price).toLocaleString()} BAM
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ) : null}
@@ -1220,16 +1263,23 @@ export default function RealEstatePricePredictorPage(): JSX.Element {
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <MapPin className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                    <p className="text-sm text-slate-500">
-                      Click on a property marker to view analysis
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="pt-6">
+                  <div className="text-center py-12">
+                    <MapPin className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                      No Property Selected
+                    </h3>
+                    <p className="text-sm text-slate-500 max-w-sm mx-auto">
+                      Click on a property marker on the map to view detailed analysis and price predictions
                     </p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>
